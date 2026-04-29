@@ -1,0 +1,17 @@
+[workspace]
+resolver = "3"
+members = [
+    "crates/libs/lib-event",
+    "crates/apps/aleph"
+]
+
+[workspace.dependencies]
+flume = { version = "0.11",  features = ["async"] }
+object = "0.39.1"
+capstone = "0.14.0"
+clap = { version = "4.5.20",  features = ["std", "cargo", "derive"] }
+derive_more = { version = "2", features = ["from", "display"] }
+tokio = { version = "1", features = ["full"] }
+tracing = { version = "0.1"}
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+goblin = "0.10.5"

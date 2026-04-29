@@ -1,0 +1,13 @@
+[package]
+name = "aleph"
+version = "0.1.0"
+edition = "2024"
+
+
+[dependencies]
+lib-event = { path="../../libs/lib-event" }
+
+derive_more = {workspace=true}
+clap = {workspace = true}
+flume = { workspace = true }
+tokio = {workspace=true}
