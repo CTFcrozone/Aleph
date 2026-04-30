@@ -8,6 +8,9 @@ pub enum Error {
 	#[from(String, &String, &str)]
 	Custom(String),
 
+	#[from]
+	Object(object::Error),
+
 	// -- Externals
 	#[from]
 	Io(std::io::Error), // as example

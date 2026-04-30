@@ -6,6 +6,8 @@ edition = "2024"
 
 [dependencies]
 lib-event = { path="../../libs/lib-event" }
+lib-elf = { path="../../libs/lib-elf" }
+
 
 derive_more = {workspace=true}
 clap = {workspace = true}

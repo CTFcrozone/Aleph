@@ -7,7 +7,7 @@ members = [
 
 [workspace.dependencies]
 flume = { version = "0.11",  features = ["async"] }
-object = "0.39.1"
+object = {version="0.39.1", features=["elf", "pe", "macho"]}
 capstone = "0.14.0"
 clap = { version = "4.5.20",  features = ["std", "cargo", "derive"] }
 derive_more = { version = "2", features = ["from", "display"] }
