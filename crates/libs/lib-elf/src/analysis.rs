@@ -1,4 +1,3 @@
-use crate::error::Result;
 use object::{
 	Architecture, BinaryFormat, Endianness, File, Object, ObjectKind, ObjectSection, ObjectSegment, ObjectSymbol,
 	Permissions, SectionFlags, SectionKind, SegmentFlags, SymbolKind, SymbolScope,

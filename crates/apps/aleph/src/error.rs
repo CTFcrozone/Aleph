@@ -8,6 +8,12 @@ pub enum Error {
 	#[from(String, &String, &str)]
 	Custom(String),
 
+	#[from]
+	Clap(clap::Error),
+
+	#[from]
+	Elf(lib_elf::Error),
+
 	// -- Externals
 	#[from]
 	Io(std::io::Error), // as example

@@ -1,7 +1,3 @@
-use std::ops::Deref;
-
-use object::{Architecture, BinaryFormat, File, Object, ObjectSection, Section};
-
 use crate::error::Result;
 
 pub struct Binary {
