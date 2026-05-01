@@ -1,7 +1,10 @@
+use capstone::{Capstone, arch::BuildsCapstone};
 use object::{
 	Architecture, BinaryFormat, Endianness, File, Object, ObjectKind, ObjectSection, ObjectSegment, ObjectSymbol,
 	Permissions, SectionFlags, SectionKind, SegmentFlags, SymbolKind, SymbolScope,
 };
+
+use crate::{Error, error::Result};
 
 #[derive(Debug)]
 pub struct SectionInfo {
@@ -30,6 +33,14 @@ pub struct SymbolInfo {
 	pub size: u64,
 	pub kind: SymbolKind,
 	pub scope: SymbolScope,
+}
+
+#[derive(Debug)]
+pub struct InstructionInfo {
+	pub addr: u64,
+	pub bytes: Vec<u8>,
+	pub mnemonic: String,
+	pub op_str: String,
 }
 
 // region:    --- Functions
@@ -95,6 +106,51 @@ pub fn symbols(file: &File) -> Vec<SymbolInfo> {
 		})
 		.collect();
 	infos
+}
+
+pub fn disasm(file: &File, section_name: &str, max_insns: Option<usize>) -> Result<Vec<InstructionInfo>> {
+	let section = file.section_by_name(section_name).ok_or(Error::SectionNotFound {
+		section: section_name.into(),
+	})?;
+
+	let code = section.uncompressed_data()?;
+	let addr = section.address();
+
+	let mut cs = match file.architecture() {
+		Architecture::X86_64 => Capstone::new().x86().mode(capstone::arch::x86::ArchMode::Mode64).build()?,
+		Architecture::X86_64_X32 | Architecture::I386 => {
+			Capstone::new().x86().mode(capstone::arch::x86::ArchMode::Mode32).build()?
+		}
+		_ => {
+			return Err(Error::UnsupportedArch {
+				arch: file.architecture(),
+			});
+		}
+	};
+
+	let endian = match file.endianness() {
+		Endianness::Little => capstone::Endian::Little,
+		Endianness::Big => capstone::Endian::Big,
+	};
+
+	cs.set_endian(endian)?;
+
+	let insns = match max_insns {
+		Some(n) => cs.disasm_count(code.as_ref(), addr, n)?,
+		None => cs.disasm_all(code.as_ref(), addr)?,
+	};
+
+	let infos: Vec<_> = insns
+		.iter()
+		.map(|i| InstructionInfo {
+			addr: i.address(),
+			bytes: i.bytes().to_vec(),
+			mnemonic: i.mnemonic().unwrap_or("<invalid>").to_string(),
+			op_str: i.op_str().unwrap_or("").to_string(),
+		})
+		.collect();
+
+	Ok(infos)
 }
 // endregion: --- Functions
 

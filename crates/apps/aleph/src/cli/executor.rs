@@ -1,52 +1,49 @@
 use clap::Parser as _;
-use lib_elf::{Binary, arch, entry, parse_binary, sections, segments, symbols};
+use lib_elf::{Binary, arch, disasm, entry, parse_binary, sections, segments, symbols};
 
 use crate::{
 	Result,
-	cli::cmd::{CliCmd, CliSubCmd},
+	cli::cmd::{CliCmd, Mode},
 };
 
 pub fn execute() -> Result<()> {
-	let cli_cmd = CliCmd::parse();
-	let Some(sub_cmd) = cli_cmd.command else {
-		println!("Aleph — binary analysis toolkit");
-		return Ok(());
-	};
+	let cli = CliCmd::parse();
 
-	match sub_cmd {
-		CliSubCmd::Info(args) => {
-			let bin = Binary::new(args.path)?;
-			let file = parse_binary(&bin)?;
+	let bin = Binary::new(&cli.path)?;
+	let file = parse_binary(&bin)?;
 
+	match cli.mode {
+		Mode::Info => {
 			println!("Format: {:?}", lib_elf::format(&file));
 			println!("Arch:   {:?}", arch(&file));
 			println!("Entry:  0x{:x}", entry(&file));
 		}
 
-		CliSubCmd::Sections(args) => {
-			let bin = Binary::new(args.path)?;
-			let file = parse_binary(&bin)?;
-
+		Mode::Sections => {
 			for s in sections(&file) {
 				println!("{s}");
 			}
 		}
 
-		CliSubCmd::Segments(args) => {
-			let bin = Binary::new(args.path)?;
-			let file = parse_binary(&bin)?;
-
+		Mode::Segments => {
 			for s in segments(&file) {
 				println!("{s}");
 			}
 		}
 
-		CliSubCmd::Symbols(args) => {
-			let bin = Binary::new(args.path)?;
-			let file = parse_binary(&bin)?;
-
+		Mode::Symbols => {
 			for s in symbols(&file) {
 				println!("{s}");
+			}
+		}
+
+		Mode::Disasm => {
+			let section = cli.section.as_deref().unwrap_or(".text");
+
+			let insns = disasm(&file, section, cli.max_insns)?;
+
+			for i in insns {
+				println!("{i}");
 			}
 		}
 	}

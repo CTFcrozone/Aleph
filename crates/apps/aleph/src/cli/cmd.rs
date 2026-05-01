@@ -1,28 +1,30 @@
-use clap::{Args, Parser, Subcommand};
+use clap::{Parser, ValueEnum};
 
 #[derive(Parser, Debug)]
-#[command(version)]
+#[command(version, about = "Aleph — binary analysis toolkit")]
 pub struct CliCmd {
-	#[command(subcommand)]
-	pub command: Option<CliSubCmd>,
-}
-
-#[derive(Subcommand, Debug)]
-pub enum CliSubCmd {
-	/// Show binary info
-	Info(FileArgs),
-
-	/// List sections
-	Sections(FileArgs),
-
-	/// List segments
-	Segments(FileArgs),
-
-	/// List symbols
-	Symbols(FileArgs),
-}
-
-#[derive(Args, Debug)]
-pub struct FileArgs {
+	/// Path to binary
+	#[arg(long)]
 	pub path: String,
+
+	/// Operation mode
+	#[arg(long)]
+	pub mode: Mode,
+
+	/// Section (used for disasm)
+	#[arg(long)]
+	pub section: Option<String>,
+
+	/// Maximum instructions for disassembly
+	#[arg(long = "max-insns")]
+	pub max_insns: Option<usize>,
+}
+
+#[derive(ValueEnum, Debug, Clone)]
+pub enum Mode {
+	Info,
+	Sections,
+	Segments,
+	Symbols,
+	Disasm,
 }

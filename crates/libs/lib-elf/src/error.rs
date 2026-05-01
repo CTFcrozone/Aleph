@@ -1,4 +1,5 @@
 use derive_more::{Display, From};
+use object::Architecture;
 
 pub type Result<T> = core::result::Result<T, Error>;
 
@@ -10,6 +11,17 @@ pub enum Error {
 
 	#[from]
 	Object(object::Error),
+
+	#[from]
+	Capstone(capstone::Error),
+
+	SectionNotFound {
+		section: String,
+	},
+
+	UnsupportedArch {
+		arch: Architecture,
+	},
 
 	// -- Externals
 	#[from]

@@ -1,6 +1,9 @@
 use std::fmt;
 
-use crate::analysis::{SectionInfo, SegmentInfo, SymbolInfo};
+use crate::{
+	InstructionInfo,
+	analysis::{SectionInfo, SegmentInfo, SymbolInfo},
+};
 
 impl fmt::Display for SectionInfo {
 	fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
@@ -29,5 +32,11 @@ impl fmt::Display for SymbolInfo {
 			"{:<30} addr=0x{:016x} size=0x{:x} kind={:?} scope={:?}",
 			self.name, self.addr, self.size, self.kind, self.scope
 		)
+	}
+}
+
+impl fmt::Display for InstructionInfo {
+	fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+		write!(f, "0x{:016x}: {:<8} {:<20}", self.addr, self.mnemonic, self.op_str)
 	}
 }
