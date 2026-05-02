@@ -12,7 +12,7 @@ pub fn execute() -> Result<()> {
 	let bin = Binary::new(&cli.path)?;
 	let file = parse_binary(&bin)?;
 
-	match cli.mode {
+	match cli.command {
 		Mode::Info => {
 			println!("Format: {:?}", lib_elf::format(&file));
 			println!("Arch:   {:?}", arch(&file));
@@ -37,10 +37,8 @@ pub fn execute() -> Result<()> {
 			}
 		}
 
-		Mode::Disasm => {
-			let section = cli.section.as_deref().unwrap_or(".text");
-
-			let insns = disasm(&file, section, cli.max_insns)?;
+		Mode::Disasm { section, max_insns } => {
+			let insns = disasm(&file, &section, max_insns)?;
 
 			for i in insns {
 				println!("{i}");
